@@ -1,45 +1,43 @@
 ---
 name: cloneit
-description: Actively inspect and clone a live website or web app by using Computer Use to navigate, click, scroll, switch tabs, open menus, review auth and onboarding surfaces, test states, capture structure/styles/interactions, and then recreate it locally in the current workspace. Use when Codex needs to closely reproduce a real product surface from a URL or visual reference, especially for interactive apps, dashboards, SaaS products, onboarding flows, login flows, or marketing pages where static screenshots are not enough.
+description: Actively inspect and clone a live website or web app by using Computer Use to navigate, click, scroll, switch tabs, open menus, review auth and onboarding surfaces, inspect computed styles, capture evidence, and then recreate it locally in the current workspace. Use when Codex needs to closely reproduce a real product surface from a URL or visual reference, especially for interactive apps, dashboards, SaaS products, onboarding flows, login flows, or marketing pages where static screenshots are not enough.
 ---
 
 # Cloneit
 
-Rebuild the target from evidence, not memory. Use Computer Use to operate the real interface, write findings into workspace artifacts, extract exact styles when needed, and only then implement the local clone.
+Rebuild the target from evidence, not memory. Operate the real interface, collect verifiable evidence, extract exact styles, and only then implement the local clone.
 
-Spacing, padding, layout rhythm, typography, and exact CSS treatment are first-class requirements. In adaptation mode, preserve the source design language so the result feels like "this same website, but for my app", not a loose inspiration or generic redesign.
+Spacing, padding, layout rhythm, typography, macro-composition, and exact CSS treatment are first-class requirements. If those are off, the clone is not done.
 
 If the repo already has a frontend stack, stay inside it. If nothing is specified and there is no existing stack, default to React + Vite + Tailwind. Use Next.js + Tailwind when the target clearly benefits from app routing, server rendering, or content-heavy page structure. Do not default to plain HTML/CSS unless the user explicitly asks for it. If the cloned behavior implies persistence, user data, or server-side workflows, create the lightest backend needed to support those behaviors.
 
 ## Workflow
 
-### 1. Create a run folder in the workspace
+### 1. Create a run folder
 
 Before inspecting the target, create a local run folder and keep findings there instead of in chat.
 
-Use this exact layout:
+Use this layout:
 
 ```text
 artifacts/cloneit/<site-slug-or-task-name>/
   screenshots/
   notes/
     source.md
+    evidence.md
     structure.md
     styles.md
     interactions.md
     components.md
     assets.md
     rebuild-plan.md
+    inspection-summary.md
     verification.md
 ```
 
-If the folders or files do not exist, create them first.
+### 2. Classify the job before inspecting
 
-### 2. Decide what surface is actually being cloned
-
-Do not assume the public homepage is the target.
-
-Determine which of these is in scope:
+Record the target surface in `notes/source.md`:
 
 - Marketing homepage
 - Logged-in app shell
@@ -48,97 +46,126 @@ Determine which of these is in scope:
 - Modal, drawer, menu, or wizard flow
 - A small set of representative app screens
 
-If the user says "clone the app", prioritize the product surface over the marketing site. Enter the app and inspect the actual working interface.
+Also classify clone depth:
 
-### 2.5. Write an adaptation brief when content is changing
+- Visual structure only
+- Visual plus interaction fidelity
+- Full workflow clone
+
+If the user says "clone the app", prioritize the product surface over the marketing site. Enter the app and inspect the actual working interface.
 
 If the user wants "this website, but for my app/product/company", write a short adaptation brief in `notes/rebuild-plan.md` before implementing.
 
 Include:
 
-- Source design cues to preserve exactly or as closely as possible
+- Source design cues to preserve
 - Product content and behavior that must change
 - Components that transfer directly
 - Components that keep the same layout language but need content substitution
 - Components that need redesign because the new app has different behavior
 
-Preserve as much of the following as possible:
+Adaptation does not reduce the inspection requirement. The goal is "the same design system and page structure, built for the new product".
 
-- Spacing scale
-- Padding and gap relationships
-- Typography scale and tone
-- Grid, alignment, and container widths
-- Section rhythm and page flow
-- Above-the-fold composition and silhouette
-- Button, chip, input, and card density
-- Navigation pattern and information hierarchy
-- Motion language and interaction feel
+### 3. Build evidence before code
 
-Aim for "the same design system and page structure, built for the new product".
+Do not implement until the applicable inspection gates are complete.
 
-### 3. Run a mandatory interaction pass before coding
+Hard gates for every task:
 
-Do not stop after reading the initial page. Use Computer Use to actively operate the interface.
+- Full-page scroll completed on every in-scope surface
+- At least one representative click-through in each major nav area
+- At least one existing populated state inspected when populated states exist
+- At least one menu, modal, drawer, or popover captured where present
+- Desktop and mobile pass completed when responsiveness matters
+
+Additional minimums by UI type:
+
+- Marketing page:
+  - Scroll to footer
+  - Inspect header, hero, primary CTA, repeated sections, pricing or proof blocks, and footer
+- App shell:
+  - Open at least one existing item from each visible collection that matters
+  - Inspect one menu or command surface
+  - Inspect one detail view
+- Chat, dashboard, or data-heavy app:
+  - Inspect one populated state
+  - Inspect one empty or sparse state if accessible
+  - Inspect one action flow such as filter, create, assign, edit, or send
+
+If a target area is inaccessible, blocked, or unsafe to exercise, record that explicitly. Missing evidence is not permission to guess.
+
+### 4. Maintain an evidence ledger
+
+For every major claim that will drive implementation, add an entry to `notes/evidence.md`.
+
+Use this shape:
+
+```markdown
+## Hero headline width
+- Surface:
+- Action taken:
+- Observed result:
+- Evidence file:
+- Status: observed | inferred
+```
+
+The evidence ledger is the source of truth. Notes may summarize, but implementation should be based on evidence.
+
+### 5. Inspect the interface actively
+
+Do not stop after reading the initial page. Use Computer Use to operate the interface.
 
 At minimum, perform the relevant subset of these actions:
 
-- Scroll from top to bottom and back through the main surface.
-- Click each primary nav item, tab, segmented control, and mode switch once.
-- Open at least one representative menu, popover, drawer, or modal in each major area.
-- Trigger hover, focus, selected, active, and disabled states when they exist.
-- Exercise one representative create, edit, or filter flow when it is safe to do so.
-- Review login, signup, onboarding, and logged-out/logged-in entry points when they are in scope and safe to inspect.
-- Inspect empty, loading, success, and error states if accessible.
-- Check desktop and mobile widths when responsive behavior matters.
+- Scroll from top to bottom and back through the main surface
+- Click each primary nav item, tab, segmented control, and mode switch once
+- Open at least one representative menu, popover, drawer, or modal in each major area
+- Trigger hover, focus, selected, active, and disabled states when they exist
+- Exercise one representative create, edit, assign, or filter flow when it is safe to do so
+- Review login, signup, onboarding, and logged-out/logged-in entry points when they are in scope and safe to inspect
+- Inspect empty, loading, success, and error states if accessible
+- Check desktop and mobile widths when responsive behavior matters
 
-If a target area is inaccessible, blocked, or unsafe to exercise, record that explicitly in `notes/source.md` and `notes/interactions.md`.
-
-### 4. Capture before implementing
-
-Use Computer Use with a browser to inspect:
-
-- Initial load state
-- Global navigation
-- Major screens or sections
-- Menus, dialogs, drawers, tabs, filters, and forms
-- Login, signup, onboarding, and account-entry surfaces when relevant
-- Scroll behavior and sticky regions
-- Repeated UI patterns
-- Responsive behavior at a minimum of desktop and mobile widths
-
-Do not start coding until the main structure, major styles, and critical interactions are written down.
-
-### 5. Persist findings into the notes files
+### 6. Capture notes and unknowns
 
 Write findings into these files as you discover them:
 
-- `notes/source.md`: URL, capture date, browser/app, auth requirements, blockers, tested surfaces
+- `notes/source.md`: URL, capture date, browser/app, auth requirements, target surface, clone depth, blockers
 - `notes/structure.md`: screen map, section order, layout, hierarchy, repeated patterns
 - `notes/styles.md`: colors, type scale, spacing, borders, shadows, radii, breakpoints
 - `notes/interactions.md`: trigger, precondition, result, animation, and evidence for each interaction
 - `notes/components.md`: reusable components, variants, props/content model, and shared styles
 - `notes/assets.md`: logos, icons, imagery, videos, gradients, fonts, and external assets
-- `notes/rebuild-plan.md`: target stack, file plan, milestones, open questions, and adaptation brief when relevant
+- `notes/rebuild-plan.md`: target stack, file plan, adaptation brief, milestones, open questions
 - `notes/verification.md`: source vs local differences, severity, and next fixes
+
+Add an `Unknowns` section to `notes/source.md` before implementation:
+
+- What was not accessible
+- What is still inferred
+- What risk that creates for fidelity
 
 Save screenshot or visual evidence into `screenshots/` with descriptive names for each important state when the environment allows it.
 
-### 6. Run a fidelity pass for small details
+### 7. Do a browser-first style inspection
 
-After the first structural pass, do a second pass focused on the details that make clones feel authentic instead of generic. Prioritize spacing and CSS fidelity above visual improvisation. If spacing, padding, line height, gaps, widths, alignment, or text treatment are off, the clone is not done.
+Prefer the live browser over terminal fetching for exact styles.
 
-Lock down the most visible 20% first: header, hero, primary CTA, and first product frame or first major content block.
+Use browser devtools first. Inspect computed or authored styles for the most visible areas before lower-priority sections:
 
-Inspect and record:
+- Header
+- Hero
+- Primary CTA
+- First product frame or first major content block
 
-- Exact text content, casing, punctuation, and line breaks
-- Font family, fallback stack, size, weight, line height, and letter spacing
-- Spacing, padding, gap, margin, and container width
-- Border width, border color, radius, and divider opacity
-- Background treatments, gradients, blur, noise, glow, and shadows
-- Icon size, icon stroke/fill style, and icon alignment
-- Button height, chip height, input height, and control density
-- Alignment details such as baseline alignment, vertical centering, and text wrapping
+Capture exact values when possible:
+
+- Font family, size, weight, line height, and letter spacing
+- Text and background colors
+- Gaps, padding, margins, widths, heights, and max widths
+- Border, radius, outline, and shadow
+- Grid and flex rules
+- Animation duration, easing, delay, and transform behavior
 
 For above-the-fold sections, capture exact numeric values when possible for:
 
@@ -152,37 +179,24 @@ For above-the-fold sections, capture exact numeric values when possible for:
 - Section top and bottom padding
 - Distance between hero copy and mockup
 
-If the source is restrained, keep the clone restrained. Do not add extra cards, wrappers, shadows, gradients, panels, or decorative elements just to fill space.
+If a value is inferred instead of observed, mark it as `inferred` in `notes/styles.md` and `notes/evidence.md`.
 
-### 7. Use direct inspection for exact values
+### 8. Use fallback CSS inspection only when needed
 
-Computer Use is for operation and discovery. Exact reconstruction usually requires direct inspection.
+If devtools inspection is blocked or incomplete, use browser-native fallbacks before terminal fetching:
 
-Use browser devtools when exact styles matter. Capture exact values when possible:
+- Devtools Sources or Network panels for loaded CSS
+- Browser console queries such as `getComputedStyle(...)`
+- Rendered DOM inspection in the live browser
 
-- Font family, size, weight, line height, and letter spacing
-- Text and background colors
-- Gaps, padding, margins, widths, heights, and max widths
-- Border, radius, outline, and shadow
-- Grid and flex rules
-- Animation duration, easing, delay, and transform behavior
-
-If a value is inferred instead of observed, mark it as `inferred` in `notes/styles.md`.
-
-Prioritize computed-style inspection for header, hero, CTA, and first major mockup before spending time on lower-visibility sections.
-
-### 8. Use terminal-based fallbacks when the browser view is not enough
-
-If Computer Use cannot reliably expose a detail, fetch supporting evidence from the terminal.
-
-Allowed fallback sources:
+If that still is not enough, use terminal-based fallbacks to supplement the browser pass:
 
 - Page HTML via `curl`
 - Referenced CSS files and downloaded stylesheets
 - Static assets such as fonts, logos, and images
 - Public page metadata such as title, description, and Open Graph assets
 
-Use these fallbacks to supplement the visual pass, not replace it.
+If public, unauthenticated browser inspection still is not enough and the environment supports it, use Playwright or another browser automation path to inspect the rendered page. Do not use Playwright as the first choice for authenticated or sensitive flows when the live browser session already has the page loaded.
 
 If stylesheets are public, inspect them for:
 
@@ -193,25 +207,53 @@ If stylesheets are public, inspect them for:
 - Motion values
 - Shared component rules
 
-If screenshot capture fails in the environment, keep going and record the blocker. Use a combination of Computer Use observations, HTML/CSS fetches, and written notes instead.
+If screenshot capture fails in the environment, keep going and record the blocker. Use a combination of Computer Use observations, live browser inspection, HTML/CSS fetches, and written notes instead.
 
-### 9. Record interactions as requirements
+### 9. Run a fidelity pass for small details
 
-For each meaningful interaction, write a block in `notes/interactions.md` using this shape:
+After the structural pass, do a second pass focused on the details that make clones feel authentic instead of generic.
 
-```markdown
-## Filter dropdown
-- Trigger:
-- Preconditions:
-- Result:
-- Animation:
-- Evidence:
-- Notes:
-```
+Lock down the most visible 20% first: header, hero, primary CTA, and first product frame or first major content block.
 
-Treat hover states, open/close states, sticky behavior, tables, filters, forms, and responsive menus as part of the clone, not polish.
+Inspect and record:
 
-### 10. Build from the inventory
+- Exact text content, casing, punctuation, and line breaks
+- Font family, fallback stack, size, weight, line height, and letter spacing
+- Spacing, padding, gap, margin, and container width
+- Border width, border color, radius, and divider opacity
+- Background treatments, gradients, blur, noise, glow, and shadows
+- Icon size, icon stroke or fill style, and icon alignment
+- Button height, chip height, input height, and control density
+- Alignment details such as baseline alignment, vertical centering, and text wrapping
+
+If the source is restrained, keep the clone restrained. Do not add extra cards, wrappers, shadows, gradients, panels, or decorative elements just to fill space.
+
+### 10. Stop if evidence is missing
+
+Before implementing a major area, check whether you have enough evidence.
+
+If you are missing evidence for:
+
+- layout structure
+- populated state
+- interaction behavior
+- exact styling for a highly visible area
+
+then do not code that area yet. Continue inspection first.
+
+### 11. Write an inspection summary before coding
+
+Before implementation, update `notes/inspection-summary.md` with:
+
+- In scope
+- Inspected
+- Not yet inspected
+- Unknowns
+- Ready to build: yes or no
+
+If `Ready to build` is not clearly `yes`, continue inspection.
+
+### 12. Build from the inventory
 
 Implement in this order:
 
@@ -223,9 +265,11 @@ Implement in this order:
 6. Responsive adjustments
 7. Asset replacement or extraction
 
-Do not aim for pixel perfection before the structural pass is complete. Get hierarchy and spacing right first, then tighten styles, then interactions, then finish with the small-detail fidelity pass. In adaptation mode, change the content and product-specific behavior while keeping the original spacing, layout language, typography rhythm, and component density as intact as possible.
+Do not aim for pixel perfection before the structural pass is complete. Get hierarchy and spacing right first, then tighten styles, then interactions, then finish with the small-detail fidelity pass.
 
-### 11. Verify against the source
+In adaptation mode, change the content and product-specific behavior while keeping the original spacing, layout language, typography rhythm, component density, page flow, and macro-composition as intact as possible.
+
+### 13. Verify against the source
 
 Run the local app and compare it to the source. Revisit the source with Computer Use for mismatches that matter.
 
@@ -253,8 +297,6 @@ Update `notes/verification.md` with:
 
 ## File Templates
 
-Use these starter templates when creating the notes.
-
 ### `notes/source.md`
 
 ```markdown
@@ -265,8 +307,27 @@ Use these starter templates when creating the notes.
 - Browser/app:
 - Auth requirements:
 - Target surface:
+- Clone depth:
 - Tested states:
 - Blocked areas:
+
+## Unknowns
+- Not accessible:
+- Still inferred:
+- Fidelity risk:
+```
+
+### `notes/evidence.md`
+
+```markdown
+# Evidence
+
+## Claim
+- Surface:
+- Action taken:
+- Observed result:
+- Evidence file:
+- Status: observed | inferred
 ```
 
 ### `notes/structure.md`
@@ -313,28 +374,16 @@ Use these starter templates when creating the notes.
 - Notes:
 ```
 
-### `notes/components.md`
+### `notes/inspection-summary.md`
 
 ```markdown
-# Components
+# Inspection Summary
 
-## Component name
-- Variants:
-- Props/content model:
-- Shared styles:
-- Used in:
-```
-
-### `notes/assets.md`
-
-```markdown
-# Assets
-
-- Asset:
-- Type:
-- Source:
-- Usage:
-- Replacement plan:
+- In scope:
+- Inspected:
+- Not yet inspected:
+- Unknowns:
+- Ready to build: yes | no
 ```
 
 ### `notes/rebuild-plan.md`
@@ -346,6 +395,13 @@ Use these starter templates when creating the notes.
 - Files to create/update:
 - Milestones:
 - Open questions:
+
+## Adaptation Brief
+- Preserve:
+- Change:
+- Direct transfers:
+- Content substitutions:
+- Redesigns:
 ```
 
 ### `notes/verification.md`
@@ -362,14 +418,17 @@ Use these starter templates when creating the notes.
 
 ## Rules
 
-- Capture first, implement second.
-- Interact with the product. Do not stop at the first visible state; click through tabs, menus, representative flows, and relevant auth/onboarding surfaces when safe.
+- No code before evidence. If the applicable gates are not complete, continue inspection.
+- Interact with the product. Do not stop at the first visible state.
+- Maintain an evidence ledger and label details as observed or inferred.
+- Use live browser inspection and devtools first for CSS and computed styles.
+- Use terminal fetches only as supporting evidence, not the primary source of truth for rendered styling.
+- Use Playwright only as a later fallback for public, unauthenticated inspection when the live browser path is insufficient.
 - Put spacing, padding, gaps, sizing, alignment, typography, and exact CSS treatment at the forefront of the work.
-- Use terminal fallbacks and inspect public stylesheets when Computer Use alone is insufficient.
+- Preserve macro-composition, especially above the fold: header height, headline width and wrap, CTA placement, mockup scale, alignment, and negative space.
 - Treat interactions as first-class requirements and record blockers explicitly when a state cannot be safely exercised.
 - Be true to the source design. Do not add generic filler UI such as extra cards, wrappers, or decorative blocks that are not present in the original.
 - In adaptation mode, keep the source's spacing, structure, page flow, and interaction language while swapping in the new product's story and behavior.
-- Preserve macro-composition, especially above the fold: header height, headline width/wrap, CTA placement, mockup scale, alignment, and negative space.
 - Reuse components when patterns repeat, mark uncertain details as inferred, and note legal or ethical boundaries when relevant.
 - Default to React + Vite + Tailwind when no stack is specified and no existing app is present. Use Next.js + Tailwind when the target clearly calls for it.
 
