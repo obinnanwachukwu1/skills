@@ -69,6 +69,7 @@ Preserve as much of the following as possible:
 - Typography scale and tone
 - Grid, alignment, and container widths
 - Section rhythm and page flow
+- Above-the-fold composition and silhouette
 - Button, chip, input, and card density
 - Navigation pattern and information hierarchy
 - Motion language and interaction feel
@@ -126,6 +127,8 @@ Save screenshot or visual evidence into `screenshots/` with descriptive names fo
 
 After the first structural pass, do a second pass focused on the details that make clones feel authentic instead of generic. Prioritize spacing and CSS fidelity above visual improvisation. If spacing, padding, line height, gaps, widths, alignment, or text treatment are off, the clone is not done.
 
+Lock down the most visible 20% first: header, hero, primary CTA, and first product frame or first major content block.
+
 Inspect and record:
 
 - Exact text content, casing, punctuation, and line breaks
@@ -136,6 +139,18 @@ Inspect and record:
 - Icon size, icon stroke/fill style, and icon alignment
 - Button height, chip height, input height, and control density
 - Alignment details such as baseline alignment, vertical centering, and text wrapping
+
+For above-the-fold sections, capture exact numeric values when possible for:
+
+- Nav height
+- Hero container width
+- Headline max width
+- Headline font size and line height
+- Hero-to-subcopy spacing
+- CTA position and offset
+- Primary mockup width and height
+- Section top and bottom padding
+- Distance between hero copy and mockup
 
 If the source is restrained, keep the clone restrained. Do not add extra cards, wrappers, shadows, gradients, panels, or decorative elements just to fill space.
 
@@ -153,6 +168,8 @@ Use browser devtools when exact styles matter. Capture exact values when possibl
 - Animation duration, easing, delay, and transform behavior
 
 If a value is inferred instead of observed, mark it as `inferred` in `notes/styles.md`.
+
+Prioritize computed-style inspection for header, hero, CTA, and first major mockup before spending time on lower-visibility sections.
 
 ### 8. Use terminal-based fallbacks when the browser view is not enough
 
@@ -220,6 +237,13 @@ Verify:
 - Scroll behavior
 - Responsive layout
 - Visual rhythm, spacing, and text ramps
+
+Do a viewport-matched comparison before finalizing:
+
+- Use the same viewport width for source and clone
+- Compare the same scroll position
+- Check header height, headline wrap, CTA placement, mockup scale, and negative space
+- Fix silhouette-level mismatches before polishing deeper sections
 
 Update `notes/verification.md` with:
 
@@ -345,6 +369,7 @@ Use these starter templates when creating the notes.
 - Treat interactions as first-class requirements and record blockers explicitly when a state cannot be safely exercised.
 - Be true to the source design. Do not add generic filler UI such as extra cards, wrappers, or decorative blocks that are not present in the original.
 - In adaptation mode, keep the source's spacing, structure, page flow, and interaction language while swapping in the new product's story and behavior.
+- Preserve macro-composition, especially above the fold: header height, headline width/wrap, CTA placement, mockup scale, alignment, and negative space.
 - Reuse components when patterns repeat, mark uncertain details as inferred, and note legal or ethical boundaries when relevant.
 - Default to React + Vite + Tailwind when no stack is specified and no existing app is present. Use Next.js + Tailwind when the target clearly calls for it.
 
