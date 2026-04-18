@@ -1,13 +1,15 @@
 ---
 name: cloneit
-description: Actively inspect and clone a live website or web app by using Computer Use to navigate, click, scroll, open menus, switch tabs, test states, capture structure/styles/interactions, and then recreate it locally in the current workspace. Use when Codex needs to closely reproduce a real product surface from a URL or visual reference, especially for interactive apps, dashboards, SaaS products, onboarding flows, or marketing pages where static screenshots are not enough.
+description: Actively inspect and clone a live website or web app by using Computer Use to navigate, click, scroll, switch tabs, open menus, review auth and onboarding surfaces, test states, capture structure/styles/interactions, and then recreate it locally in the current workspace. Use when Codex needs to closely reproduce a real product surface from a URL or visual reference, especially for interactive apps, dashboards, SaaS products, onboarding flows, login flows, or marketing pages where static screenshots are not enough.
 ---
 
 # Cloneit
 
 Rebuild the target from evidence, not memory. Use Computer Use to operate the real interface, write findings into workspace artifacts, extract exact styles when needed, and only then implement the local clone.
 
-If the repo already has a frontend stack, stay inside it. If the repo is empty, create the lightest viable local app for the requested fidelity.
+Spacing, padding, layout rhythm, typography, and exact CSS treatment are first-class requirements. In adaptation mode, preserve the source design language so the result feels like "this same website, but for my app", not a loose inspiration or generic redesign.
+
+If the repo already has a frontend stack, stay inside it. If nothing is specified and there is no existing stack, default to React + Vite + Tailwind. Use Next.js + Tailwind when the target clearly benefits from app routing, server rendering, or content-heavy page structure. Do not default to plain HTML/CSS unless the user explicitly asks for it. If the cloned behavior implies persistence, user data, or server-side workflows, create the lightest backend needed to support those behaviors.
 
 ## Workflow
 
@@ -48,6 +50,31 @@ Determine which of these is in scope:
 
 If the user says "clone the app", prioritize the product surface over the marketing site. Enter the app and inspect the actual working interface.
 
+### 2.5. Write an adaptation brief when content is changing
+
+If the user wants "this website, but for my app/product/company", write a short adaptation brief in `notes/rebuild-plan.md` before implementing.
+
+Include:
+
+- Source design cues to preserve exactly or as closely as possible
+- Product content and behavior that must change
+- Components that transfer directly
+- Components that keep the same layout language but need content substitution
+- Components that need redesign because the new app has different behavior
+
+Preserve as much of the following as possible:
+
+- Spacing scale
+- Padding and gap relationships
+- Typography scale and tone
+- Grid, alignment, and container widths
+- Section rhythm and page flow
+- Button, chip, input, and card density
+- Navigation pattern and information hierarchy
+- Motion language and interaction feel
+
+Aim for "the same design system and page structure, built for the new product".
+
 ### 3. Run a mandatory interaction pass before coding
 
 Do not stop after reading the initial page. Use Computer Use to actively operate the interface.
@@ -55,10 +82,11 @@ Do not stop after reading the initial page. Use Computer Use to actively operate
 At minimum, perform the relevant subset of these actions:
 
 - Scroll from top to bottom and back through the main surface.
-- Click each primary nav item, tab, or mode switch once.
+- Click each primary nav item, tab, segmented control, and mode switch once.
 - Open at least one representative menu, popover, drawer, or modal in each major area.
 - Trigger hover, focus, selected, active, and disabled states when they exist.
 - Exercise one representative create, edit, or filter flow when it is safe to do so.
+- Review login, signup, onboarding, and logged-out/logged-in entry points when they are in scope and safe to inspect.
 - Inspect empty, loading, success, and error states if accessible.
 - Check desktop and mobile widths when responsive behavior matters.
 
@@ -72,6 +100,7 @@ Use Computer Use with a browser to inspect:
 - Global navigation
 - Major screens or sections
 - Menus, dialogs, drawers, tabs, filters, and forms
+- Login, signup, onboarding, and account-entry surfaces when relevant
 - Scroll behavior and sticky regions
 - Repeated UI patterns
 - Responsive behavior at a minimum of desktop and mobile widths
@@ -88,12 +117,29 @@ Write findings into these files as you discover them:
 - `notes/interactions.md`: trigger, precondition, result, animation, and evidence for each interaction
 - `notes/components.md`: reusable components, variants, props/content model, and shared styles
 - `notes/assets.md`: logos, icons, imagery, videos, gradients, fonts, and external assets
-- `notes/rebuild-plan.md`: target stack, file plan, milestones, and open questions
+- `notes/rebuild-plan.md`: target stack, file plan, milestones, open questions, and adaptation brief when relevant
 - `notes/verification.md`: source vs local differences, severity, and next fixes
 
 Save screenshot or visual evidence into `screenshots/` with descriptive names for each important state when the environment allows it.
 
-### 6. Use direct inspection for exact values
+### 6. Run a fidelity pass for small details
+
+After the first structural pass, do a second pass focused on the details that make clones feel authentic instead of generic. Prioritize spacing and CSS fidelity above visual improvisation. If spacing, padding, line height, gaps, widths, alignment, or text treatment are off, the clone is not done.
+
+Inspect and record:
+
+- Exact text content, casing, punctuation, and line breaks
+- Font family, fallback stack, size, weight, line height, and letter spacing
+- Spacing, padding, gap, margin, and container width
+- Border width, border color, radius, and divider opacity
+- Background treatments, gradients, blur, noise, glow, and shadows
+- Icon size, icon stroke/fill style, and icon alignment
+- Button height, chip height, input height, and control density
+- Alignment details such as baseline alignment, vertical centering, and text wrapping
+
+If the source is restrained, keep the clone restrained. Do not add extra cards, wrappers, shadows, gradients, panels, or decorative elements just to fill space.
+
+### 7. Use direct inspection for exact values
 
 Computer Use is for operation and discovery. Exact reconstruction usually requires direct inspection.
 
@@ -108,22 +154,31 @@ Use browser devtools when exact styles matter. Capture exact values when possibl
 
 If a value is inferred instead of observed, mark it as `inferred` in `notes/styles.md`.
 
-### 7. Use terminal-based fallbacks when the browser view is not enough
+### 8. Use terminal-based fallbacks when the browser view is not enough
 
 If Computer Use cannot reliably expose a detail, fetch supporting evidence from the terminal.
 
 Allowed fallback sources:
 
 - Page HTML via `curl`
-- Referenced CSS files
+- Referenced CSS files and downloaded stylesheets
 - Static assets such as fonts, logos, and images
 - Public page metadata such as title, description, and Open Graph assets
 
-Use these fallbacks to supplement the visual pass, not replace it. Do not reduce the workflow to "take screenshots and guess".
+Use these fallbacks to supplement the visual pass, not replace it.
+
+If stylesheets are public, inspect them for:
+
+- CSS variables and design tokens
+- Typography scales
+- Spacing scales
+- Breakpoints
+- Motion values
+- Shared component rules
 
 If screenshot capture fails in the environment, keep going and record the blocker. Use a combination of Computer Use observations, HTML/CSS fetches, and written notes instead.
 
-### 8. Record interactions as requirements
+### 9. Record interactions as requirements
 
 For each meaningful interaction, write a block in `notes/interactions.md` using this shape:
 
@@ -137,9 +192,9 @@ For each meaningful interaction, write a block in `notes/interactions.md` using 
 - Notes:
 ```
 
-Treat hover states, open/close states, sticky behavior, carousels, tables, filters, forms, and responsive menus as part of the clone, not polish.
+Treat hover states, open/close states, sticky behavior, tables, filters, forms, and responsive menus as part of the clone, not polish.
 
-### 9. Build from the inventory
+### 10. Build from the inventory
 
 Implement in this order:
 
@@ -151,9 +206,9 @@ Implement in this order:
 6. Responsive adjustments
 7. Asset replacement or extraction
 
-Do not aim for pixel perfection before the structural pass is complete. Get hierarchy and spacing right first, then tighten styles, then interactions.
+Do not aim for pixel perfection before the structural pass is complete. Get hierarchy and spacing right first, then tighten styles, then interactions, then finish with the small-detail fidelity pass. In adaptation mode, change the content and product-specific behavior while keeping the original spacing, layout language, typography rhythm, and component density as intact as possible.
 
-### 10. Verify against the source
+### 11. Verify against the source
 
 Run the local app and compare it to the source. Revisit the source with Computer Use for mismatches that matter.
 
@@ -284,17 +339,14 @@ Use these starter templates when creating the notes.
 ## Rules
 
 - Capture first, implement second.
-- Interact with the product. Do not stop at the first visible state.
-- If the target is an app, enter the app and exercise its core surfaces.
-- Keep a written record of every non-trivial finding in the workspace.
-- Prefer exact observed values over approximation.
-- Use terminal fallbacks for HTML, CSS, and assets when Computer Use alone is insufficient.
-- Treat interactions as first-class requirements.
-- Preserve the target information architecture even if the implementation stack changes.
-- Reuse components when multiple screens or sections share the same pattern.
-- If a detail is uncertain, mark it as inferred instead of pretending it is exact.
-- If a state cannot be safely exercised, record the blocker explicitly.
-- Note legal or ethical boundaries if the user asks to copy proprietary assets or code verbatim.
+- Interact with the product. Do not stop at the first visible state; click through tabs, menus, representative flows, and relevant auth/onboarding surfaces when safe.
+- Put spacing, padding, gaps, sizing, alignment, typography, and exact CSS treatment at the forefront of the work.
+- Use terminal fallbacks and inspect public stylesheets when Computer Use alone is insufficient.
+- Treat interactions as first-class requirements and record blockers explicitly when a state cannot be safely exercised.
+- Be true to the source design. Do not add generic filler UI such as extra cards, wrappers, or decorative blocks that are not present in the original.
+- In adaptation mode, keep the source's spacing, structure, page flow, and interaction language while swapping in the new product's story and behavior.
+- Reuse components when patterns repeat, mark uncertain details as inferred, and note legal or ethical boundaries when relevant.
+- Default to React + Vite + Tailwind when no stack is specified and no existing app is present. Use Next.js + Tailwind when the target clearly calls for it.
 
 ## Example Triggers
 
@@ -302,3 +354,4 @@ Use these starter templates when creating the notes.
 - "Open this SaaS app, click through the main screens, and rebuild it locally."
 - "Use Computer Use to inspect this dashboard and clone the actual product surface, not just the homepage."
 - "Study this onboarding flow, capture each step and state, and recreate it in Next.js."
+- "Make my app's marketing site as if Linear's website had been designed for my product."
